@@ -1,33 +1,6 @@
-var mca_draft = { 1177: 12607 };
-var mca_submit = { 1177: 12607 };
-var pk_map = {
-    67: 'tunsuccessful_contact_autosave_id',
-    69: 'tunscheduled_contact_autosave_id',
-    110: 'tseven_or_fourteen_day_follow_autosave_id',
-    163: 'tunsuccessful_contact_autosave_id',
-    178: 'tpcsp_autosave_id',
-    177: 'tinterrai_autosave_id',
-    179: 'tsrt_assessment_autosave_id',
-    1177: 'tsrt_email_id',
-    180: 'thra_assessment_autosave_id',
-    1117: 'tnew_member_orientation_autosave_id',
-    1118: 'tunsuccessful_contact_autosave_id',
-    1135: 'tunsuccessful_contact_autosave_id',
-    1137: 'twelcome_call_autosave_id',
-    1138: 'tunsuccessful_contact_autosave_id',
-    1193: 'thedis_id'
-};
-var table_name = {
-    177: 'x_interrai_autosave',
-    178: 'x_pcsp_autosave',
-    1107: 'x_permission_to_contact',
-    1132: 'x_phi',
-    1133: 'x_foc',
-    1134: 'x_service_provider_choice'
-};
-// keys equivalent
-// pk => table_id_column, tpk => table_pk, 
+// keys equivalent pk => table_id_column, tpk => table_pk, 
 var activity_map = {
+    // WELCOME CALL
     66: {
         draft_form: 10669,
         submit_form: 10670,
@@ -37,106 +10,146 @@ var activity_map = {
         instant_push_bf_id: 2785,
         instant_push_bf_param: 'xwelcome_call_id'
     },
+    // UNSUCCESSFUL WELCOME CALL
     67: {
         draft_form: 10716,
         submit_form: 10717,
         table_name: 'x_unsuccessful_contact_autosave',
-        pk: 'unsuccessful_contact_autosave_id',
-        tpk: 'tunsuccessful_contact_autosave_id'
+        table_id_column: 'unsuccessful_contact_autosave_id',
+        table_pk: 'tunsuccessful_contact_autosave_id',
+        is_unsuccessful_contact: true,
+        instant_push_bf_id: 2752,
+        instant_push_bf_param: 'xunsuccessful_contact_autosa_id'
     },
+    // UNSCHEDULED CONTACT
     69: {
         draft_form: 10723,
         submit_form: 10724,
         table_name: 'x_unscheduled_contact_autosave',
-        pk: 'unscheduled_contact_autosave_id',
-        tpk: 'tunscheduled_contact_autosave_id'
+        table_id_column: 'unscheduled_contact_autosave_id',
+        table_pk: 'tunscheduled_contact_autosave_id',
+        instant_push_bf_id: 2793,
+        instant_push_bf_param: 'xunscheduled_id'
     },
+    // UNSUCCESSFUL 7-14 FOLLOW UP CALL
     110: {
         draft_form: 10627,
         submit_form: 10628,
         table_name: 'x_seven_or_fourteen_day_follow_autosave',
-        pk: 'seven_or_fourteen_day_follow_autosave_id',
-        tpk: 'tseven_or_fourteen_day_follow_autosave_id'
+        table_id_column: 'seven_or_fourteen_day_follow_autosave_id',
+        table_pk: 'tseven_or_fourteen_day_follow_autosave_id',
+        instant_push_bf_id: 2800,
+        instant_push_bf_param: 'x_seven_fourteen_id'
     },
+    // UNSUCCESSFUL 7-14 FOLLOW UP CALL
     163: {
         draft_form: 10716,
         submit_form: 10717,
         table_name: 'x_unsuccessful_contact_autosave',
-        pk: 'unsuccessful_contact_autosave_id',
-        tpk: 'tunsuccessful_contact_autosave_id'
+        table_id_column: 'unsuccessful_contact_autosave_id',
+        table_pk: 'tunsuccessful_contact_autosave_id',
+        is_unsuccessful_contact: true,
+        instant_push_bf_id: 2752,
+        instant_push_bf_param: 'xunsuccessful_contact_autosa_id'
     },
+    // INTERRAI
     177: {
         draft_form: 10816,
         submit_form: 10817,
         table_name: 'x_interrai_autosave',
-        pk: 'interrai_autosave_id',
-        tpk: 'tinterrai_autosave_id'
+        table_id_column: 'interrai_autosave_id',
+        table_pk: 'tinterrai_autosave_id',
+        instant_push_bf_id: 2770,
+        instant_push_bf_param: 'xinterrai_autosave_id'
     },
+    // PCSP
     178: {
         draft_form: 11306,
         submit_form: 11307,
         table_name: 'x_pcsp_autosave',
-        pk: 'pcsp_autosave_id',
-        tpk: 'tpcsp_autosave_id'
+        table_id_column: 'pcsp_autosave_id',
+        table_pk: 'tpcsp_autosave_id',
     },
+    // SRT
     179: {
         draft_form: 11166,
         submit_form: 11167,
         table_name: 'x_srt_assessment_autosave',
-        pk: 'srt_assessment_autosave_id',
-        tpk: 'tsrt_assessment_autosave_id'
+        table_id_column: 'srt_assessment_autosave_id',
+        table_pk: 'tsrt_assessment_autosave_id',
+        instant_push_bf_id: 2721,
+        instant_push_bf_param: 'xsrt_assessment_autosave_id'
     },
+    // HRA
     180: {
         draft_form: 11164,
         submit_form: 11165,
         table_name: 'x_hra_assessment_autosave',
-        pk: 'hra_assessment_autosave_id',
-        tpk: 'thra_assessment_autosave_id'
+        table_id_column: 'hra_assessment_autosave_id',
+        table_pk: 'thra_assessment_autosave_id',
+        instant_push_bf_id: 2822,
+        instant_push_bf_param: 'xhra_id'
     },
+    // NEW MEMBER ORIENTATION
     1117: {
         draft_form: 10730,
         submit_form: 10731,
         table_name: 'x_new_member_orientation_autosave',
-        pk: 'new_member_orientation_autosave_id',
-        tpk: 'tnew_member_orientation_autosave_id'
+        table_id_column: 'new_member_orientation_autosave_id',
+        table_pk: 'tnew_member_orientation_autosave_id',
+        instant_push_bf_id: 2764,
+        instant_push_bf_param: 'xnmo_id'
     },
+    // UNSUCCESSFUL NEW MEMBER ORIENTATION
     1118: {
         draft_form: 10716,
         submit_form: 10717,
         table_name: 'x_unsuccessful_contact_autosave',
-        pk: 'unsuccessful_contact_autosave_id',
-        tpk: 'tunsuccessful_contact_autosave_id'
+        table_id_column: 'unsuccessful_contact_autosave_id',
+        table_pk: 'tunsuccessful_contact_autosave_id',
+        is_unsuccessful_contact: true,
+        instant_push_bf_id: 2752,
+        instant_push_bf_param: 'xunsuccessful_contact_autosa_id'
     },
     1135: {
         draft_form: 10716,
         submit_form: 10717,
         table_name: 'x_unsuccessful_contact_autosave',
-        pk: 'unsuccessful_contact_autosave_id',
-        tpk: 'tunsuccessful_contact_autosave_id'
+        table_id_column: 'unsuccessful_contact_autosave_id',
+        table_pk: 'tunsuccessful_contact_autosave_id',
+        instant_push_bf_id: 2752,
+        instant_push_bf_param: 'xunsuccessful_contact_autosa_id'
     },
     1137: {
         draft_form: 10669,
         submit_form: 10670,
         table_name: 'x_welcome_call_autosave',
-        pk: 'welcome_call_autosave_id',
-        tpk: 'twelcome_call_autosave_id'
+        table_id_column: 'welcome_call_autosave_id',
+        table_pk: 'twelcome_call_autosave_id',
+        instant_push_bf_id: 2785,
+        instant_push_bf_param: 'xwelcome_call_id'
     },
     1138: {
         draft_form: 10716,
         submit_form: 10717,
         table_name: 'x_unsuccessful_contact_autosave',
-        pk: 'unsuccessful_contact_autosave_id',
-        tpk: 'tunsuccessful_contact_autosave_id'
+        table_id_column: 'unsuccessful_contact_autosave_id',
+        table_pk: 'tunsuccessful_contact_autosave_id',
+        instant_push_bf_id: 2752,
+        instant_push_bf_param: 'xunsuccessful_contact_autosa_id'
     },
+    // HEDIS
     1193: {
         draft_form: 12607,
         submit_form: 12607,
         table_name: 'x_hedis',
-        pk: 'hedis_id',
-        tpk: 'thedis_id'
+        table_id_column: 'hedis_id',
+        table_pk: 'thedis_id',
+        instant_push_bf_id: 2835,
+        instant_push_bf_param: 'xnfhedis_id'
     }
 }
-
+// I think this is unsuccessful list
 var ulist = [1118, 67, 163];
 var special_forms = { 1132: 11290, 1133: 11292, 1134: 11291, 1107: 11450, 1136: 10091, 1139: 11508 }
 
