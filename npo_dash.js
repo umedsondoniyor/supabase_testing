@@ -81,7 +81,7 @@ var activity_map = {
         instant_push_bf_param: 'xsrt_assessment_autosave_id'
     },
     // HRA
-    180: { 
+    180: {
         draft_form: 11164,
         submit_form: 11165,
         table_name: 'x_hra_assessment_autosave',
@@ -204,8 +204,6 @@ var activity_map = {
         instant_push_bf_param: 'xnfhedis_id'
     }
 }
-// I think this is unsuccessful list
-var ulist = [1118, 67, 163];
 
 var downloadInterRAIFile = function (filename, encoded_pdf) {
     var exportedFilename = filename + '.pdf';
@@ -234,12 +232,15 @@ var downloadInterRAIFile = function (filename, encoded_pdf) {
 function getDownloadButton(row) {
     if (row.md5) {
         return _(Button, {
-            color: 'primary',
-            title: 'Download', onClick: () => {
+            color: 'primary', title: 'Download', key: row.mca_id + '_download', 
+            onClick: () => {
                 toastr.info('Retrieving the PDF file.')
                 iwb.request({
                     url: 'ajaxExecDbFunc?_did=2553',
-                    params: { id: row.mca_id, table_name: table_name[row.lkp_activity] },
+                    params: { 
+                        id: row.mca_id, 
+                        table_name: activity_map[row.lkp_activity].table_name
+                    },
                     successCallback: (res) => {
                         const encoded_pdf = res.result.encoded_pdf;
                         if (encoded_pdf === '' || encoded_pdf === null) {
@@ -248,10 +249,14 @@ function getDownloadButton(row) {
                             var exportedFilename = row.filename + '.pdf';
                             const byteCharacters = atob(res.result.encoded_pdf);
                             const byteNumbers = new Array(byteCharacters.length);
-                            for (let i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
+                            for (let i = 0; i < byteCharacters.length; i++) {
+                                byteNumbers[i] = byteCharacters.charCodeAt(i);
+                            }
                             const byteArray = new Uint8Array(byteNumbers);
                             var blob = new Blob([byteArray], { type: 'application/pdf' });
-                            if (navigator.msSaveBlob) { navigator.msSaveBlob(blob, exportedFilename) } else {
+                            if (navigator.msSaveBlob) {
+                                navigator.msSaveBlob(blob, exportedFilename)
+                            } else {
                                 var link = document.createElement("a");
                                 if (link.download !== undefined) {
                                     var url = URL.createObjectURL(blob);
