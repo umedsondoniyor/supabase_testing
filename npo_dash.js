@@ -205,40 +205,40 @@ var activity_map = {
     }
 }
 
-var downloadInterRAIFile = function (filename, encoded_pdf) {
-    var exportedFilename = filename + '.pdf';
-    const byteCharacters = atob(encoded_pdf);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    var blob = new Blob([byteArray], { type: 'application/pdf' });
-    if (navigator.msSaveBlob) {
-        navigator.msSaveBlob(blob, exportedFilename)
-    } else {
-        var link = document.createElement("a");
-        if (link.download !== undefined) {
-            var url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", exportedFilename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    }
-}
+// var downloadInterRAIFile = function (filename, encoded_pdf) {
+//     var exportedFilename = filename + '.pdf';
+//     const byteCharacters = atob(encoded_pdf);
+//     const byteNumbers = new Array(byteCharacters.length);
+//     for (let i = 0; i < byteCharacters.length; i++) {
+//         byteNumbers[i] = byteCharacters.charCodeAt(i);
+//     }
+//     const byteArray = new Uint8Array(byteNumbers);
+//     var blob = new Blob([byteArray], { type: 'application/pdf' });
+//     if (navigator.msSaveBlob) {
+//         navigator.msSaveBlob(blob, exportedFilename)
+//     } else {
+//         var link = document.createElement("a");
+//         if (link.download !== undefined) {
+//             var url = URL.createObjectURL(blob);
+//             link.setAttribute("href", url);
+//             link.setAttribute("download", exportedFilename);
+//             link.style.visibility = 'hidden';
+//             document.body.appendChild(link);
+//             link.click();
+//             document.body.removeChild(link);
+//         }
+//     }
+// }
 function getDownloadButton(row) {
     if (row.md5) {
         return _(Button, {
-            color: 'primary', title: 'Download', key: row.mca_id + '_download', 
+            color: 'primary', title: 'Download', key: row.mca_id + '_download',
             onClick: () => {
                 toastr.info('Retrieving the PDF file.')
                 iwb.request({
                     url: 'ajaxExecDbFunc?_did=2553',
-                    params: { 
-                        id: row.mca_id, 
+                    params: {
+                        id: row.mca_id,
                         table_name: activity_map[row.lkp_activity].table_name
                     },
                     successCallback: (res) => {
@@ -275,27 +275,41 @@ function getDownloadButton(row) {
         }, _("span", { className: "icon-cloud-download" }))
     }
 }
-var editButton = function (lkp_activity, pk, id) {
+var editButton = function (row) {
+    var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+    var form_id = activity_map[lkp_activity].draft_form;
+    var pk = activity_map[lkp_activity].table_pk;
+    var id = row.mca_id;
     var className = "icon-pencil";
     var color = "warning";
+    var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id + "&view=1";
+
+    // IF YOU WANT TO ADD EXTRA URL PARAMETERS FOR YOUR CASE
+    // PLEASE, ADD BELOW THIS LINE AND DO AS SHOWN IN THE CASES ABOVE
+
+    // if Choice Froms (FOC,PHI,SPC)
+    if (activity_map[lkp_activity].is_special) {
+        url += '&xlkp_mca_status=1';
+    }
+
     // if HEDIS we change icon
-    if (lkp_activity == 12607) {
+    if (form_id == 12607) {
         className = "icon-magnifier";
         color = "primary";
     }
-    return _(
-        Button, {
-        title: getLocMsg("edit"),
-        key: "123", color: color,
-        onClick: event => {
-            var url = 'showForm?a=1&_fid=' + lkp_activity + '&' + pk + '=' + id;
-            //IF HEDIS
-            if (lkp_activity == 12607) {
-                url += '&view=1';
+    return _(Button,
+        {
+            color: color,
+            title: getLocMsg("edit"),
+            key: id + '_edit',
+            onClick: () => {
+                //IF HEDIS
+                if (form_id == 12607) {
+                    url += '&view=1';
+                }
+                iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
             }
-            iwb.openTab("1-" + Math.random(), url, {}, { openEditable: true });
-        }
-    },
+        },
         _("span", { className: className })
     );
 }
