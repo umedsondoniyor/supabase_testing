@@ -81,7 +81,7 @@ var activity_map = {
         instant_push_bf_param: 'xsrt_assessment_autosave_id'
     },
     // HRA
-    180: {
+    180: { 
         draft_form: 11164,
         submit_form: 11165,
         table_name: 'x_hra_assessment_autosave',
@@ -89,6 +89,61 @@ var activity_map = {
         table_pk: 'thra_assessment_autosave_id',
         instant_push_bf_id: 2822,
         instant_push_bf_param: 'xhra_id'
+    },
+    // FOC
+    1133: {
+        draft_form: 11292,
+        submit_form: 11292,
+        table_name: 'x_foc',
+        table_id_column: 'foc_id',
+        table_pk: 'tfoc_id',
+        is_special: true,
+        instant_push_bf_id: 2872,
+        instant_push_bf_param: 'xfoc_id'
+    },
+    // PHI
+    1132: {
+        draft_form: 11290,
+        submit_form: 11290,
+        table_name: 'x_phi',
+        table_id_column: 'phi_id',
+        table_pk: 'tphi_id',
+        is_special: true,
+        instant_push_bf_id: 2873,
+        instant_push_bf_param: 'xphi_id'
+    },
+    // SPC
+    1134: {
+        draft_form: 11291,
+        submit_form: 11291,
+        table_name: 'x_service_provider_choice',
+        table_id_column: 'service_provider_choice_id',
+        table_pk: 'tservice_provider_choice_id',
+        is_special: true,
+        instant_push_bf_id: 2874,
+        instant_push_bf_param: 'xservice_provider_choice_id'
+    },
+    // SRT EMAIL
+    1139: {
+        draft_form: 11508,
+        submit_form: 11508,
+        table_name: 'x_srt_email',
+        table_id_column: 'srt_email_id',
+        table_pk: 'tsrt_email_id',
+        is_special: true,
+        instant_push_bf_id: -1,
+        // instant_push_bf_param: ''
+    },
+    // GENERAL NOTE
+    1136: {
+        draft_form: 10091,
+        submit_form: 10091,
+        table_name: 'x_general_note',
+        table_id_column: 'general_note_id',
+        table_pk: 'tgeneral_note_id',
+        is_special: true,
+        instant_push_bf_id: -1,
+        // instant_push_bf_param: ''
     },
     // NEW MEMBER ORIENTATION
     1117: {
@@ -151,7 +206,6 @@ var activity_map = {
 }
 // I think this is unsuccessful list
 var ulist = [1118, 67, 163];
-var special_forms = { 1132: 11290, 1133: 11292, 1134: 11291, 1107: 11450, 1136: 10091, 1139: 11508 }
 
 var downloadInterRAIFile = function (filename, encoded_pdf) {
     var exportedFilename = filename + '.pdf';
@@ -177,7 +231,6 @@ var downloadInterRAIFile = function (filename, encoded_pdf) {
         }
     }
 }
-
 function getDownloadButton(row) {
     if (row.md5) {
         return _(Button, {
@@ -217,8 +270,6 @@ function getDownloadButton(row) {
         }, _("span", { className: "icon-cloud-download" }))
     }
 }
-
-
 var editButton = function (lkp_activity, pk, id) {
     var className = "icon-pencil";
     var color = "warning";
@@ -243,7 +294,6 @@ var editButton = function (lkp_activity, pk, id) {
         _("span", { className: className })
     );
 }
-
 var viewButton = function (lkp_activity, pk, id) {
     return _(Button, {
         color: 'primary',
@@ -257,8 +307,6 @@ var viewButton = function (lkp_activity, pk, id) {
         }
     }, _('i', { className: 'icon-magnifier' }))
 }
-
-
 var addButton = function (fid, str, lkp_activity, id) {
     return _(Button, {
         color: 'primary',
@@ -290,8 +338,6 @@ var addButton = function (fid, str, lkp_activity, id) {
         }
     }, _('i', { className: 'icon-plus' }))
 }
-
-
 var deleteButton = function (lkp_activity, pk, id) {
     return _(
         Button, {
@@ -316,8 +362,6 @@ var deleteButton = function (lkp_activity, pk, id) {
     },
         _("span", { className: "icon-trash" }))
 }
-
-
 var reviewPdf = function (row) {
     var dsc = 'Review PDF';
     var link = 'showForm?a=2&_fid=11863&xparticipant_id=' + row.npo_id + "&xfilename=" + row.filename +
@@ -333,7 +377,6 @@ var reviewPdf = function (row) {
         }
     }, dsc)
 }
-
 function reupload(row) {
     return _(Button, {
         color: 'primary',
@@ -348,7 +391,6 @@ function reupload(row) {
         }
     }, _('i', { className: 'icon-reload' }))
 }
-
 var authorizeServices = function (row) {
     if (row.lkp_compliant != null && 1 * row.lkp_compliant == 9999) {
         return _(Button, {
@@ -367,7 +409,6 @@ var authorizeServices = function (row) {
     }, _('i', { className: 'icon-plus' }));
 
 }
-
 var instantPush = (row) => {
     var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
     // WE SHOW INSTANT PUSH BUTTON IF ONLY THE USER HAS PERMISSION TO PUSH RECORD TO ENVOLVE
@@ -409,7 +450,6 @@ var instantPush = (row) => {
         );
     }
 }
-
 // Can be used to have colorful text for MCA status
 var statusText = (status_string, lkp_mca_status) => {
     var statusColor = {
