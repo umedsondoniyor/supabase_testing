@@ -229,6 +229,7 @@ var activity_map = {
 //         }
 //     }
 // }
+
 function getDownloadButton(row) {
     if (row.md5) {
         return _(Button, {
@@ -275,13 +276,14 @@ function getDownloadButton(row) {
         }, _("span", { className: "icon-cloud-download" }))
     }
 }
-var editButton = function (row) {
+var editButton = (row) => {
     var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
     var form_id = activity_map[lkp_activity].draft_form;
     var pk = activity_map[lkp_activity].table_pk;
     var id = row.mca_id;
     var className = "icon-pencil";
     var color = "warning";
+
     var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id + "&view=1";
 
     // IF YOU WANT TO ADD EXTRA URL PARAMETERS FOR YOUR CASE
@@ -313,73 +315,101 @@ var editButton = function (row) {
         _("span", { className: className })
     );
 }
-var viewButton = function (lkp_activity, pk, id) {
-    return _(Button, {
-        color: 'primary',
-        title: 'View', onClick: () => {
-            var url = 'showForm?a=1&_fid=' + lkp_activity + '&disabled=1&' + pk + '=' + id;
-            // if HEDIS
-            if (lkp_activity == 12607) {
-                url += '&view=1';
+var viewButton = (row) => {
+    var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+    var form_id = activity_map[lkp_activity].submit_form;
+    var pk = activity_map[lkp_activity].table_pk;
+    var id = row.mca_id;
+
+    var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id + '&disabled=1&view=1';
+
+    // IF YOU WANT TO ADD EXTRA URL PARAMETERS FOR YOUR CASE
+    // PLEASE, ADD BELOW THIS LINE AND DO AS SHOWN IN THE CASES ABOVE
+
+    return _(Button,
+        {
+            color: 'primary',
+            title: 'View',
+            key: id + '_view',
+            onClick: () => {
+                iwb.openTab("1-" + Math.random(), url, {}, { openEditable: true });
             }
-            iwb.openTab("1-" + Math.random(), url, {}, { openEditable: true });
-        }
-    }, _('i', { className: 'icon-magnifier' }))
+        },
+        'View'
+    );
 }
-var addButton = function (fid, str, lkp_activity, id) {
+var addButton = (row) => {
+    var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+    var form_id = activity_map[lkp_activity].draft_form;
+    var pk = activity_map[lkp_activity].table_pk;
+    var npo_id = row.npo_id;
+    var url = 'showForm?a=2&viewMode=true&_fid=' + form_id
+        + '&ilkp_participant_type=1&ilkp_activity_type=2&iparticipant_id=' + npo_id;
+
+    if ([1135].indexOf(lkp_activity) !== -1) {
+        url += '&xlkp_reason_for_contact=11';
+    }
+    if (lkp_activity == 1137) {
+        url += '&xlkp_contact_method=1';
+    }
+    if ([11290, 11292, 11291].indexOf(form_id) !== -1) {
+        url += '&xlkp_mca_status=1';
+    }
+    if ([67, 1138].indexOf(lkp_activity) !== -1) {
+        url += '&xlkp_reason_for_contact=16&xlkp_contact_method=1';
+    }
+    if (lkp_activity == 1118) {
+        url += '&xlkp_reason_for_contact=10';
+    }
+    if ([1135, 1136, 1138, 1137].indexOf(lkp_activity) !== -1) {
+        url += '&xopened_by_activity=' + lkp_activity;
+    }
+    if (lkp_activity == 1193) {
+        url += '&xlkp_mca_status=2';
+    }
+    console.log("fid: " + form_id, "lkp_activity: " + lkp_activity, "npo_id: " + npo_id)
+
     return _(Button, {
         color: 'primary',
-        title: 'Add ' + str, onClick: () => {
-            let url = 'showForm?a=2&_fid=' + fid + '&ilkp_activity_type=1&iparticipant_id=' + id;
-            if ([1135].indexOf(lkp_activity) !== -1) {
-                url += '&xlkp_reason_for_contact=11';
-            }
-            if (lkp_activity == 1137) {
-                url += '&xlkp_contact_method=1';
-            }
-            if ([11290, 11292, 11291].indexOf(fid) !== -1) {
-                url += '&xlkp_mca_status=1';
-            }
-            if ([67, 1138].indexOf(lkp_activity) !== -1) {
-                url += '&xlkp_reason_for_contact=16&xlkp_contact_method=1';
-            }
-            if (lkp_activity == 1118) {
-                url += '&xlkp_reason_for_contact=10';
-            }
-            if ([1135, 1136, 1138, 1137].indexOf(lkp_activity) !== -1) {
-                url += '&xopened_by_activity=' + lkp_activity;
-            }
-            if (lkp_activity == 1193) {
-                url += '&xlkp_mca_status=2';
-            }
-            console.log("fid: " + fid, "str: " + str, "lkp_activity: " + lkp_activity, "id: " + id)
-            iwb.openTab("2-" + Math.random(), url);
+        title: 'Add ',
+        key: lkp_activity + '_add',
+        onClick: () => {
+            iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
         }
     }, _('i', { className: 'icon-plus' }))
 }
-var deleteButton = function (lkp_activity, pk, id) {
-    return _(
-        Button, {
-        title: getLocMsg("are_you_sure"),
-        key: "123", color: 'danger',
-        onClick: event => {
-            event && event.preventDefault && event.preventDefault();
-            let url = 'ajaxPostForm?a=3&_fid=' + lkp_activity + '&' + pk + '=' + id;
-            yesNoDialog({
-                text: getLocMsg("are_you_sure"),
-                callback: success =>
-                    success &&
-                    iwb.request({
-                        url,
-                        successCallback: () => {
-                            iwb.closeTab(event, success)
-                            grd_compliance_4npo.cmp.loadData(true);
-                        }
-                    })
-            });
-        }
-    },
-        _("span", { className: "icon-trash" }))
+var deleteButton = (row) => {
+    // WE SHOW DELETE BUTTON IF ONLY THE USER HAS PERMISSION TO DELETE
+    // FOLLOW THE CODE BELOW TO UNDERSTAND WHAT WE MEAN
+    if (row.delete_flag && 1 * row.delete_flag > 0) {
+        var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+        var form_id = activity_map[lkp_activity].submit_form;
+        var pk = activity_map[lkp_activity].table_pk;
+        var id = row.mca_id;
+        var url = 'ajaxPostForm?a=3&_fid=' + form_id + '&' + pk + '=' + id;
+        return _(
+            Button, {
+            title: getLocMsg("Delete"),
+            key: row.service_verification_id + '_delete',
+            color: 'danger',
+            onClick: event => {
+                event && event.preventDefault && event.preventDefault();
+                yesNoDialog({
+                    text: _("h6", { style: { color: "black", fontWeight: "bold" } }, "YOU ARE ABOUT TO DELETE A RECORD. ARE YOU SURE?"),
+                    callback: success =>
+                        success &&
+                        iwb.request({
+                            url,
+                            successCallback: () => {
+                                iwb.closeTab(event, success)
+                                grd_compliance_4npo.cmp.loadData(true);
+                            }
+                        })
+                });
+            }
+        },
+            _("span", { className: "icon-trash" }))
+    }
 }
 var reviewPdf = function (row) {
     var dsc = 'Review PDF';
