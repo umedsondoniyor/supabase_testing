@@ -411,51 +411,78 @@ var deleteButton = (row) => {
             _("span", { className: "icon-trash" }))
     }
 }
-var reviewPdf = function (row) {
-    var dsc = 'Review PDF';
-    var link = 'showForm?a=2&_fid=11863&xparticipant_id=' + row.npo_id + "&xfilename=" + row.filename +
-        "&xlkp_activity=" + row.lkp_activity + "&xmca_id=" + row.mca_id;
-    if ([1, 3, 26].indexOf(1 * row.review_status) >= 0) {
-        dsc = "Approved PDF";
-        link += "&xreview=" + row.review_status
-    }
-    return _(Button, {
-        color: 'primary',
-        title: dsc, onClick: () => {
-            iwb.openTab("1-" + Math.random(), link, {}, { openEditable: true });
+var reviewPdf = (row) => {
+    // WE SHOW REVIEW BUTTON IF ONLY THE USER HAS PERMISSION TO REVIEW THE PDF
+    // FOLLOW THE CODE BELOW TO UNDERSTAND WHAT WE MEAN
+    if (row.md5 && row.review_flag && 1 * row.review_flag > 0) {
+        var form_id = 11863;
+        var npo_id = row.npo_id;
+        var filename = row.filename;
+        var lkp_activity = row.lkp_activity;
+        var mca_id = row.mca_id;
+        var review_status = row.review_status;
+        var dsc = 'Review PDF';
+        var url = 'showForm?a=2&_fid=' + form_id + '&xparticipant_id=' + npo_id + '&xfilename=' + filename +
+            '&xlkp_activity=' + lkp_activity + '&xmca_id=' + mca_id;
+
+        if (1 * review_status === 1 || 1 * review_status === 3 || 1 * review_status === 26) {
+            dsc = "Approved PDF";
+            url += "&xreview=" + review_status;
         }
-    }, dsc)
-}
-function reupload(row) {
-    return _(Button, {
-        color: 'primary',
-        title: 'Reupload', onClick: () => {
-            iwb.request({
-                url: 'ajaxExecDbFunc?_did=2421',
-                params: { table_name: activity_map[row.lkp_activity].table_name, id_field: activity_map[row.lkp_activity].pk, id: row.mca_id },
-                successCallback: function (res) {
-                    grd_compliance_4npo.cmp.loadData(true);
+
+        return _(Button,
+            {
+                color: 'primary',
+                title: dsc,
+                key: mca_id + '_review',
+                onClick: () => {
+                    iwb.openTab("1-" + Math.random(), url, {}, { openEditable: true });
                 }
-            });
-        }
-    }, _('i', { className: 'icon-reload' }))
+            },
+            dsc
+        );
+    }
 }
-var authorizeServices = function (row) {
-    if (row.lkp_compliant != null && 1 * row.lkp_compliant == 9999) {
-        return _(Button, {
+var reupload = (row) => {
+    return _(Button,
+        {
             color: 'primary',
-            title: 'View', onClick: () => {
-                iwb.openTab("1-" + Math.random(), 'showForm?a=1&_fid=8062&tactivity_id=' + row.activity_id, {}, { openEditable: true });
+            title: 'Reupload',
+            key: row.mca_id + '_reupload',
+            onClick: () => {
+                iwb.request({
+                    url: 'ajaxExecDbFunc?_did=2421',
+                    params: {
+                        table_name: activity_map[row.lkp_activity].table_name,
+                        id_field: activity_map[row.lkp_activity].table_id_column,
+                        id: row.mca_id
+                    },
+                    successCallback: function (res) {
+                        grd_compliance_4npo.cmp.loadData(true);
+                    }
+                });
             }
-        }, _('i', { className: 'icon-eye' }))
+        }, _('i', { className: 'icon-reload' }))
+}
+var authorizeServices = (row) => {
+    if (row.lkp_compliant != null && 1 * row.lkp_compliant == 9999) {
+        return _(Button,
+            {
+                color: 'primary',
+                title: 'View', onClick: () => {
+                    iwb.openTab("1-" + Math.random(), 'showForm?a=1&_fid=8062&tactivity_id=' +
+                        row.activity_id, {}, { openEditable: true });
+                }
+            }, _('i', { className: 'icon-eye' }))
     }
     var link = 'showForm?a=2&_fid=12184&xparticipant_id=' + row.npo_id;
-    return _(Button, {
-        color: 'primary',
-        title: 'Add ' + row.lkp_activity, onClick: () => {
-            iwb.openTab("1-" + Math.random(), link, {}, { openEditable: true });
-        }
-    }, _('i', { className: 'icon-plus' }));
+    return _(Button,
+        {
+            color: 'primary',
+            title: 'Add ' + row.lkp_activity, onClick: () => {
+                iwb.openTab("1-" + Math.random(), link, {}, { openEditable: true });
+            }
+        }, _('i', { className: 'icon-plus' }));
 
 }
 var instantPush = (row) => {
@@ -486,10 +513,10 @@ var instantPush = (row) => {
                                     body: child1
                                 });
 
-                                grd_phw_compliance4par.cmp.loadData(true);
+                                grd_compliance_4npo.cmp.loadData(true);
                             } else if (res.result.code == 0) {
                                 toastr.info(res.result.msg);
-                                grd_phw_compliance4par.cmp.loadData(true);
+                                grd_compliance_4npo.cmp.loadData(true);
                             }
                         }
                     });
