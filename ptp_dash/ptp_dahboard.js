@@ -262,9 +262,7 @@ var activity_map = {
 var getDownloadButton = (row) => {
     if (row.md5) {
         return _(Button, {
-            color: 'primary',
-            title: 'Download',
-            key: row.mca_id + '_download',
+            color: 'primary', title: 'Download', key: row.mca_id + '_download',
             onClick: () => {
                 toastr.info('Retrieving the PDF file.')
                 iwb.request({
