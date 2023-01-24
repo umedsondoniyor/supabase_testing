@@ -200,8 +200,18 @@ var activity_map = {
         table_name: 'x_hedis',
         table_id_column: 'hedis_id',
         table_pk: 'thedis_id',
-        instant_push_bf_id: 2835,
-        instant_push_bf_param: 'xnfhedis_id'
+        instant_push_bf_id: 2799,
+        instant_push_bf_param: 'xhedis_id'
+    },
+    // MULTIPLE MCA
+    'hybrid': {
+        draft_form: 11965,
+        submit_form: 11975,
+        table_name: 'x_hybrid_mca',
+        table_id_column: 'hybrid_mca_id',
+        table_pk: 'thybrid_mca_id',
+        instant_push_bf_id: 2784,
+        instant_push_bf_param: 'xmultiple_id'
     }
 }
 
@@ -277,42 +287,75 @@ function getDownloadButton(row) {
     }
 }
 var editButton = (row) => {
+    if (activity_map[row.lkp_activity]) {
+        var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+        var form_id = activity_map[lkp_activity].draft_form;
+        var pk = activity_map[lkp_activity].table_pk;
+        var id = row.mca_id;
+        var className = "icon-pencil";
+        var color = "warning";
+
+        var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id + "&view=1";
+
+        // IF YOU WANT TO ADD EXTRA URL PARAMETERS FOR YOUR CASE
+        // PLEASE, ADD BELOW THIS LINE AND DO AS SHOWN IN THE CASES ABOVE
+
+        // if Choice Froms (FOC,PHI,SPC)
+        if (activity_map[lkp_activity].is_special) {
+            url += '&xlkp_mca_status=1';
+        }
+
+        // if HEDIS we change icon
+        if (form_id == 12607) {
+            className = "icon-magnifier";
+            color = "primary";
+        }
+        return _(Button,
+            {
+                color: color,
+                title: getLocMsg("edit"),
+                key: id + '_edit',
+                onClick: () => {
+                    //IF HEDIS
+                    if (form_id == 12607) {
+                        url += '&view=1';
+                    }
+                    iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
+                }
+            },
+            _("span", { className: className })
+        );
+    }
+}
+var submitButton = (row) => {
     var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
-    var form_id = activity_map[lkp_activity].draft_form;
+    var form_id = activity_map[lkp_activity].submit_form;
     var pk = activity_map[lkp_activity].table_pk;
     var id = row.mca_id;
-    var className = "icon-pencil";
-    var color = "warning";
+    var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id;
 
-    var url = 'showForm?a=1&_fid=' + form_id + '&' + pk + '=' + id + "&view=1";
-
+    // if UNSUCCESSFUL
+    if (form_id * 1 == 10717) {
+        url += '&imemberrefusal=1'
+    }
     // IF YOU WANT TO ADD EXTRA URL PARAMETERS FOR YOUR CASE
     // PLEASE, ADD BELOW THIS LINE AND DO AS SHOWN IN THE CASES ABOVE
 
     // if Choice Froms (FOC,PHI,SPC)
     if (activity_map[lkp_activity].is_special) {
-        url += '&xlkp_mca_status=1';
+        url += '&xlkp_mca_status=8';
     }
 
-    // if HEDIS we change icon
-    if (form_id == 12607) {
-        className = "icon-magnifier";
-        color = "primary";
-    }
     return _(Button,
         {
-            color: color,
-            title: getLocMsg("edit"),
-            key: id + '_edit',
+            color: 'primary',
+            title: 'Submit',
+            key: id + '_submit',
             onClick: () => {
-                //IF HEDIS
-                if (form_id == 12607) {
-                    url += '&view=1';
-                }
                 iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
             }
         },
-        _("span", { className: className })
+        'Submit'
     );
 }
 var viewButton = (row) => {
@@ -339,44 +382,46 @@ var viewButton = (row) => {
     );
 }
 var addButton = (row) => {
-    var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
-    var form_id = activity_map[lkp_activity].draft_form;
-    var pk = activity_map[lkp_activity].table_pk;
-    var npo_id = row.npo_id;
-    var url = 'showForm?a=2&viewMode=true&_fid=' + form_id
-        + '&ilkp_participant_type=1&ilkp_activity_type=2&iparticipant_id=' + npo_id;
+    if (activity_map[row.lkp_activity]) {
+        var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+        var form_id = activity_map[lkp_activity].draft_form;
+        var pk = activity_map[lkp_activity].table_pk;
+        var npo_id = row.npo_id;
+        var url = 'showForm?a=2&viewMode=true&_fid=' + form_id
+            + '&ilkp_participant_type=1&ilkp_activity_type=2&iparticipant_id=' + npo_id;
 
-    if ([1135].indexOf(lkp_activity) !== -1) {
-        url += '&xlkp_reason_for_contact=11';
-    }
-    if (lkp_activity == 1137) {
-        url += '&xlkp_contact_method=1';
-    }
-    if ([11290, 11292, 11291].indexOf(form_id) !== -1) {
-        url += '&xlkp_mca_status=1';
-    }
-    if ([67, 1138].indexOf(lkp_activity) !== -1) {
-        url += '&xlkp_reason_for_contact=16&xlkp_contact_method=1';
-    }
-    if (lkp_activity == 1118) {
-        url += '&xlkp_reason_for_contact=10';
-    }
-    if ([1135, 1136, 1138, 1137].indexOf(lkp_activity) !== -1) {
-        url += '&xopened_by_activity=' + lkp_activity;
-    }
-    if (lkp_activity == 1193) {
-        url += '&xlkp_mca_status=2';
-    }
-    console.log("fid: " + form_id, "lkp_activity: " + lkp_activity, "npo_id: " + npo_id)
-
-    return _(Button, {
-        color: 'primary',
-        title: 'Add ',
-        key: lkp_activity + '_add',
-        onClick: () => {
-            iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
+        if ([1135].indexOf(lkp_activity) !== -1) {
+            url += '&xlkp_reason_for_contact=11';
         }
-    }, _('i', { className: 'icon-plus' }))
+        if (lkp_activity == 1137) {
+            url += '&xlkp_contact_method=1';
+        }
+        if ([11290, 11292, 11291].indexOf(form_id) !== -1) {
+            url += '&xlkp_mca_status=1';
+        }
+        if ([67, 1138].indexOf(lkp_activity) !== -1) {
+            url += '&xlkp_reason_for_contact=16&xlkp_contact_method=1';
+        }
+        if (lkp_activity == 1118) {
+            url += '&xlkp_reason_for_contact=10';
+        }
+        if ([1135, 1136, 1138, 1137].indexOf(lkp_activity) !== -1) {
+            url += '&xopened_by_activity=' + lkp_activity;
+        }
+        if (lkp_activity == 1193) {
+            url += '&xlkp_mca_status=2';
+        }
+        console.log("fid: " + form_id, "lkp_activity: " + lkp_activity, "npo_id: " + npo_id)
+
+        return _(Button, {
+            color: 'primary',
+            title: 'Add ',
+            key: lkp_activity + '_add',
+            onClick: () => {
+                iwb.openTab("2-" + Math.random(), url, {}, { openEditable: true });
+            }
+        }, _('i', { className: 'icon-plus' }))
+    }
 }
 var deleteButton = (row) => {
     // WE SHOW DELETE BUTTON IF ONLY THE USER HAS PERMISSION TO DELETE
@@ -486,44 +531,46 @@ var authorizeServices = (row) => {
 
 }
 var instantPush = (row) => {
-    var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
-    // WE SHOW INSTANT PUSH BUTTON IF ONLY THE USER HAS PERMISSION TO PUSH RECORD TO ENVOLVE
-    // FOLLOW THE CODE BELOW TO UNDERSTAND WHAT WE MEAN
-    if (activity_map[lkp_activity].instant_push_bf_id > 0 && row.instantpush_flag && 1 * row.instantpush_flag > 0) {
-        var lkp_activity = row.hybrid ? 'hybrid' : 1 * row.lkp_activity;
-        return _(Button,
-            {
-                title: getLocMsg("Instant Push"),
-                color: 'primary',
-                key: row.mca_id + '_instantPush',
-                onClick: event => {
-                    iwb.request({
-                        url: 'ajaxExecDbFunc?_did=' + activity_map[lkp_activity].instant_push_bf_id,
-                        requestWaitMsg: true,
-                        params: {
-                            [activity_map[lkp_activity].instant_push_bf_param]: row.mca_id
-                        },
-                        successCallback: function (res) {
-                            if (res.result.code == 1) {
-                                var child1 = React.createElement('div', { dangerouslySetInnerHTML: { __html: res.result.data } });
+    if (activity_map[row.lkp_activity]) {
+        var lkp_activity = row.hybrid ? 'hybrid' : row.lkp_activity;
+        // WE SHOW INSTANT PUSH BUTTON IF ONLY THE USER HAS PERMISSION TO PUSH RECORD TO ENVOLVE
+        // FOLLOW THE CODE BELOW TO UNDERSTAND WHAT WE MEAN
+        if (activity_map[lkp_activity].instant_push_bf_id > 0 && row.instantpush_flag && 1 * row.instantpush_flag > 0) {
+            var lkp_activity = row.hybrid ? 'hybrid' : 1 * row.lkp_activity;
+            return _(Button,
+                {
+                    title: getLocMsg("Instant Push"),
+                    color: 'primary',
+                    key: row.mca_id + '_instantPush',
+                    onClick: event => {
+                        iwb.request({
+                            url: 'ajaxExecDbFunc?_did=' + activity_map[lkp_activity].instant_push_bf_id,
+                            requestWaitMsg: true,
+                            params: {
+                                [activity_map[lkp_activity].instant_push_bf_param]: row.mca_id
+                            },
+                            successCallback: function (res) {
+                                if (res.result.code == 1) {
+                                    var child1 = React.createElement('div', { dangerouslySetInnerHTML: { __html: res.result.data } });
 
-                                iwb.showModal({
-                                    title: 'Instant Push result',
-                                    size: 'md',
-                                    body: child1
-                                });
+                                    iwb.showModal({
+                                        title: 'Instant Push result',
+                                        size: 'md',
+                                        body: child1
+                                    });
 
-                                grd_compliance_4npo.cmp.loadData(true);
-                            } else if (res.result.code == 0) {
-                                toastr.info(res.result.msg);
-                                grd_compliance_4npo.cmp.loadData(true);
+                                    grd_compliance_4npo.cmp.loadData(true);
+                                } else if (res.result.code == 0) {
+                                    toastr.info(res.result.msg);
+                                    grd_compliance_4npo.cmp.loadData(true);
+                                }
                             }
-                        }
-                    });
-                }
-            },
-            _("span", { className: "fas2 fa-arrow-up" })
-        );
+                        });
+                    }
+                },
+                _("span", { className: "fas2 fa-arrow-up" })
+            );
+        }
     }
 }
 // Can be used to have colorful text for MCA status
